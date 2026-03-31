@@ -1,0 +1,57 @@
+{
+  "app": {
+    "signingConfigs": [
+      {
+        "name": "default",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\Ruiming\\.ohos\\config\\default_sevenzip-harmony-test-main_2EqNf1tYO5FwZxcTa8oJ8lpz6cFb2QJz_csTdHFl2vE=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001B2F180373E6301AA9DB75FF8916A01E4DCD55D6ACCDC050CE040EB65833BC03A9A291DA7A1B4912",
+          "profile": "C:\\Users\\Ruiming\\.ohos\\config\\default_sevenzip-harmony-test-main_2EqNf1tYO5FwZxcTa8oJ8lpz6cFb2QJz_csTdHFl2vE=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\Ruiming\\.ohos\\config\\default_sevenzip-harmony-test-main_2EqNf1tYO5FwZxcTa8oJ8lpz6cFb2QJz_csTdHFl2vE=.p12",
+          "storePassword": "0000001BBDBE626EC0C44D17D3591A3F9B1ED165A9C3767BD8C46B605C07A76D50517C8EAA968CC32B5C0A"
+        }
+      }
+    ],
+    "products": [
+      {
+        "name": "default",
+        "signingConfig": "default",
+        "targetSdkVersion": "6.0.1(21)",
+        "compatibleSdkVersion": "5.0.0(12)",
+        "runtimeOS": "HarmonyOS",
+        "buildOption": {
+          "nativeCompiler": "BiSheng",
+          "strictMode": {
+            "caseSensitiveCheck": true,
+            "useNormalizedOHMUrl": true
+          }
+        }
+      }
+    ],
+    "buildModeSet": [
+      {
+        "name": "debug"
+      },
+      {
+        "name": "release"
+      }
+    ]
+  },
+  "modules": [
+    {
+      "name": "entry",
+      "srcPath": "./entry",
+      "targets": [
+        {
+          "name": "default",
+          "applyToProducts": [
+            "default"
+          ]
+        }
+      ]
+    }
+  ]
+}
