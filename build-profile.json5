@@ -5,13 +5,13 @@
         "name": "default",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\Ruiming\\.ohos\\config\\default_sevenzip-harmony-test-main_2EqNf1tYO5FwZxcTa8oJ8lpz6cFb2QJz_csTdHFl2vE=.cer",
+          "certpath": "C:/Users/Ruiming/.ohos/config/default_sevenzip-harmony-test-main_2EqNf1tYO5FwZxcTa8oJ8lpz6cFb2QJz_csTdHFl2vE=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001B2F180373E6301AA9DB75FF8916A01E4DCD55D6ACCDC050CE040EB65833BC03A9A291DA7A1B4912",
-          "profile": "C:\\Users\\Ruiming\\.ohos\\config\\default_sevenzip-harmony-test-main_2EqNf1tYO5FwZxcTa8oJ8lpz6cFb2QJz_csTdHFl2vE=.p7b",
+          "keyPassword": "0000001B24872BDCF9AB482BE35176B5B4713FDCF002978BD9FDF7FE35173DAA5C6387CF33E2D546CADBFC",
+          "profile": "C:/Users/Ruiming/.ohos/config/default_sevenzip-harmony-test-main_2EqNf1tYO5FwZxcTa8oJ8lpz6cFb2QJz_csTdHFl2vE=.p7b",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\Ruiming\\.ohos\\config\\default_sevenzip-harmony-test-main_2EqNf1tYO5FwZxcTa8oJ8lpz6cFb2QJz_csTdHFl2vE=.p12",
-          "storePassword": "0000001BBDBE626EC0C44D17D3591A3F9B1ED165A9C3767BD8C46B605C07A76D50517C8EAA968CC32B5C0A"
+          "storeFile": "C:/Users/Ruiming/.ohos/config/default_sevenzip-harmony-test-main_2EqNf1tYO5FwZxcTa8oJ8lpz6cFb2QJz_csTdHFl2vE=.p12",
+          "storePassword": "0000001BDD140DEC695EECF7ED1FCBAB9D3370F455CEA2C34F27452D7CEAA63B5D0F7942D7087C2D19B28B"
         }
       }
     ],
@@ -19,11 +19,27 @@
       {
         "name": "default",
         "signingConfig": "default",
-        "targetSdkVersion": "6.0.1(21)",
-        "compatibleSdkVersion": "5.0.0(12)",
+        "targetSdkVersion": "6.1.0(23)",
+        "compatibleSdkVersion": "5.0.1(13)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {
           "nativeCompiler": "BiSheng",
+          // 关键配置：强制使用 Release 构建模式
+          "externalNativeOptions": {
+            "path": "./src/main/cpp/CMakeLists.txt",
+            // 传递 CMake 参数，强制设置构建类型为 Release
+            "arguments": [
+              "-DCMAKE_BUILD_TYPE=Release"
+            ],
+            // 添加 C/C++ 编译优化标志（会被追加到 CMake 的选项后）
+            "cppFlags": "-march=armv8.2-a+crypto+fp16+rcpc -O3 -ftree-vectorize -fomit-frame-pointer -fstrict-aliasing -fno-semantic-interposition -pipe",
+            // 如果希望启用 LTO，可以添加：
+            // "cppFlags": "-flto=thin",
+            // 仅编译 arm64-v8a 架构（根据你的设备）
+            "abiFilters": [
+              "arm64-v8a"
+            ]
+          },
           "strictMode": {
             "caseSensitiveCheck": true,
             "useNormalizedOHMUrl": true

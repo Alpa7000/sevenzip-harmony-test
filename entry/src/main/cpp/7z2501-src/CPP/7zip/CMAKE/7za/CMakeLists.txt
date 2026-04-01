@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.15)
 project(SevenZip VERSION 24.0 LANGUAGES C CXX ASM)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_C_FLAGS_RELEASE "")
+set(CMAKE_CXX_FLAGS_RELEASE "")
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -35,7 +42,7 @@ if(USE_CLANG)
     list(APPEND BASE_COMPILE_FLAGS -mbranch-protection=standard)
 endif()
 
-set(USE_ASM OFF)
+set(USE_ASM ON)
 
 # 调试/发布模式
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -52,15 +59,26 @@ set(WARN_FLAGS -Wall -Wextra)
 # 通用编译选项
 add_compile_options(
     ${BASE_COMPILE_FLAGS}
-    ${DEBUG_FLAGS}
     ${WARN_FLAGS}
+    -DNDEBUG                       # 禁用断言
     -D_REENTRANT
     -D_FILE_OFFSET_BITS=64
     -D_LARGEFILE_SOURCE
     -fPIC
     -O3
-    -march=armv8-a+crypto
+    -march=armv8.2-a+crypto+fp16+rcpc
+    -mtune=cortex-a76              # 针对麒麟 9000/8000 的 Cortex-A76/A77 优化
+    -ftree-vectorize
+    -fomit-frame-pointer
+    -fstrict-aliasing
+    -fno-semantic-interposition
+    -pipe
+    # 可选激进优化（若稳定可保留）
+    -ffast-math
+    -funroll-loops
 )
+
+set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
 
 # ================== 源文件列表定义 ==================
 set(COMMON_SOURCES
@@ -508,6 +526,7 @@ if(USE_ASM)
     if(IS_ARM64)
         # ARM64 汇编文件（GNU 语法）
         set(ASM_SOURCES
+            ../../../../Asm/arm64/LzmaDecOpt.S
             ../../../../C/7zCrcOpt.c
             ../../../../C/XzCrc64Opt.c
             ../../../../C/Sha1Opt.c
@@ -541,7 +560,6 @@ if(USE_ASM)
 else()
     # 使用 C 优化文件（备选）
     set(ASM_SOURCES
-        ../../../../Asm/arm64/LzmaDecOpt.S
         ../../../../C/7zCrcOpt.c
         ../../../../C/XzCrc64Opt.c
         ../../../../C/Sha1Opt.c
@@ -596,8 +614,9 @@ add_library(7za SHARED
     ${ASM_SOURCES}
 )
 
+
 # 导出 main 符号
-target_compile_definitions(7za PRIVATE EXPORT_MAIN)
+target_compile_definitions(7za PRIVATE EXPORT_MAIN JE_MALLOC)
 
 # 链接库
 if(WIN32)
@@ -619,6 +638,14 @@ set_target_properties(7za PROPERTIES
 if(USE_ASM)
     target_compile_definitions(7za PRIVATE Z7_7ZIP_ASM)
 endif()
+
+target_link_options(7za PRIVATE
+    -Wl,-Bsymbolic           # 优先解析库内符号，减少 PLT 跳转
+    -Wl,-z,now               # 立即绑定所有符号（禁用懒绑定）
+    -Wl,-z,relro             # 只读重定位段
+    -Wl,--gc-sections        # 去除未使用的代码段
+    -Wl,--icf=all            # 合并相同函数
+)
 
 # 架构定义（仅 Windows 需要）
 if(WIN32)
